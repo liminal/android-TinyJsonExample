@@ -19,11 +19,17 @@ public class MainActivity extends AppCompatActivity {
     private TextView messageView;
     private TextView subtitleView;
 
+    /**
+     * Plain old java object used to model the incoming JSON data
+     */
     static class Message {
         public String message;
         public String subtitle;
     }
 
+    /**
+     * Interface class used by Retrofit to model the REST endpoint we make the call to
+     */
     public interface FoaaService {
 
         @GET("/awesome/{from}")
@@ -40,15 +46,20 @@ public class MainActivity extends AppCompatActivity {
         messageView = (TextView) findViewById(R.id.message);
         subtitleView = (TextView) findViewById(R.id.subtitle);
 
+        // Create the retrofit object used to instantiate the Rest service
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://www.foaas.com/")
                 .addConverterFactory(MoshiConverterFactory.create())
                 .build();
 
+        // Use the retrofit object to create an client for your api endpoints
         FoaaService restService = retrofit.create(FoaaService.class);
 
+        // use the client to generate a call model
         Call<Message> call = restService.getStuffFromServer("A name here");
 
+        // tell the call model to call out to the server, fetch the Json, parse the Message and
+        // provide a Callback that deals with the response
         call.enqueue(new Callback<Message>() {
             @Override
             public void onResponse(Call<Message> call, Response<Message> response) {
